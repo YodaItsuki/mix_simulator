@@ -100,7 +100,7 @@ class seigyo{ //audiocontextとボリュームのノードとEQのノードの�
     else{
       setTimeout(function(){
         if(saiseiichi.max < this.audio.duration){ //もし読み込んだ音源が再生位置のスライダーの最大の値を超えた場合
-          saiseiichi.max = this.audio.duration //再生位置のスライダーの最大の値変える
+          saiseiichi.max = this.audio.duration; //再生位置のスライダーの最大の値変える
         }
         for(var i = 0 ; i < audio.length ; i++){
           if(saiseiichi.max == audio[i].duration){ //すべての音源と比較して読み込んだ音源の時間が一番長いときの動作
@@ -393,7 +393,7 @@ var analizer_canvas_text = document.querySelector('#analizer_canvas_text');
 var analizer_canvas_text_ctx = analizer_canvas_text.getContext('2d');
 var zahyou_sa = (analizer_canvas_text.height - analizer_canvas.height) / 2; //グラフを描画するcanvasとテキストとグリッドを表示するcanbasの間にできる空白の大きさ
 var x,y;
-var Hz = [20,50,100,200,500,1000,2000,5000,10000,20000]
+var Hz = [20,50,100,200,500,1000,2000,5000,10000,20000];
 
 //グリッドとテキストの描画
 analizer_canvas_text_ctx.beginPath();
@@ -418,7 +418,7 @@ for(var i = 0 ; i < 10 ; i++){
 var measure = analizer_canvas_text_ctx.measureText("[Hz]");
   analizer_canvas_text_ctx.fillText("[Hz]" , analizer_canvas_text.width - 25 - (measure.width / 2), (analizer_canvas_text.height - zahyou_sa) + 10);
 
-analizer_canvas_text_ctx.strokeStyle = "rgb(255,150,150)"
+analizer_canvas_text_ctx.strokeStyle = "rgb(255,150,150)";
 analizer_canvas_text_ctx.stroke() ;
 
 window.setInterval(function() { //描画を繰り返す
