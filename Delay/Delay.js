@@ -210,7 +210,7 @@ class effectset{ //エフェクトを操作するクラス
 //ここまでクラス
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
-var number_of_seigyo = 4; //制御する音源の数
+var number_of_seigyo = 6; //制御する音源の数
 var seigyo_elements = new Array(number_of_seigyo); //音源の制御する配列
 for(var i = 0; i < number_of_seigyo; i++) {
   var audioCtx = new AudioContext();

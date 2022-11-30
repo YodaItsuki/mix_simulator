@@ -1,25 +1,16 @@
 .effect_object{
     display: flex;
 }
-#comp_canvas{
-    position: absolute;
-    transform: translate(50px,50px);
-}
-#meter_canvas{
-    position: absolute;
-    transform: translate(50px,50px);
-    /*border: solid 1px #000000;*/
-}
 .effects_view{
     margin-top: 15px;
 }
 .volume_pan{
     margin:4px;
 }
-.comp{
+.reverb{
     margin: 4px;
 }
-.comp #effects{
+.reverb #effects{
     display: inline-block;
     text-align: center;
     width: 70px;
