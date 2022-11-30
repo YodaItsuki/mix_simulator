@@ -233,20 +233,20 @@ class seigyo{ //audiocontextとボリュームのノードとエフェクター�
     comp_canvas_ctx.clearRect(0, 0, comp_canvas.width, comp_canvas.height);
     comp_canvas_ctx.beginPath();
     comp_canvas_ctx.strokeStyle = 'black';
-    comp_canvas_ctx.moveTo(comp_canvas.width - (comp_canvas.height / 60) * Math.abs(seigyo_elements[sentaku].effect_temp[0]),(comp_canvas.height / 60) * Math.abs(seigyo_elements[sentaku].effect_temp[0]));
+    comp_canvas_ctx.moveTo(comp_canvas.width - (comp_canvas.height / 80) * Math.abs(seigyo_elements[sentaku].effect_temp[0]),(comp_canvas.height / 80) * Math.abs(seigyo_elements[sentaku].effect_temp[0]));
     comp_canvas_ctx.lineTo(0,comp_canvas.height);
     comp_canvas_ctx.stroke();
-
+    
     comp_canvas_ctx.beginPath();
     comp_canvas_ctx.strokeStyle = 'black';
-    comp_canvas_ctx.moveTo(comp_canvas.width - (comp_canvas.height / 60) * Math.abs(seigyo_elements[sentaku].effect_temp[0]),(comp_canvas.height / 60) * Math.abs(seigyo_elements[sentaku].effect_temp[0]));
-    comp_canvas_ctx.lineTo(comp_canvas.width,((comp_canvas.height / 60) * Math.abs(seigyo_elements[sentaku].effect_temp[0])) - (((comp_canvas.height / 60) * Math.abs(seigyo_elements[sentaku].effect_temp[0])) / seigyo_elements[sentaku].effect_temp[1]));
+    comp_canvas_ctx.moveTo(comp_canvas.width - (comp_canvas.height / 80) * Math.abs(seigyo_elements[sentaku].effect_temp[0]),(comp_canvas.height / 80) * Math.abs(seigyo_elements[sentaku].effect_temp[0]));
+    comp_canvas_ctx.lineTo(comp_canvas.width,((comp_canvas.height / 80) * Math.abs(seigyo_elements[sentaku].effect_temp[0])) - (((comp_canvas.height / 80) * Math.abs(seigyo_elements[sentaku].effect_temp[0])) / seigyo_elements[sentaku].effect_temp[1]));
     comp_canvas_ctx.stroke();
-
+    
     comp_canvas_ctx.beginPath();
     comp_canvas_ctx.strokeStyle = 'orangered';
-    comp_canvas_ctx.moveTo(0,(comp_canvas.height / 60) * Math.abs(seigyo_elements[sentaku].effect_temp[0]));
-    comp_canvas_ctx.lineTo(comp_canvas.width,(comp_canvas.height / 60) * Math.abs(seigyo_elements[sentaku].effect_temp[0]));
+    comp_canvas_ctx.moveTo(0,(comp_canvas.height / 80) * Math.abs(seigyo_elements[sentaku].effect_temp[0]));
+    comp_canvas_ctx.lineTo(comp_canvas.width,(comp_canvas.height / 80) * Math.abs(seigyo_elements[sentaku].effect_temp[0]));
     comp_canvas_ctx.stroke();
   }
 
@@ -371,20 +371,20 @@ class effectset{ //エフェクトを操作するクラス
     comp_canvas_ctx.clearRect(0, 0, comp_canvas.width, comp_canvas.height);
     comp_canvas_ctx.beginPath();
     comp_canvas_ctx.strokeStyle = 'black';
-    comp_canvas_ctx.moveTo(comp_canvas.width - (comp_canvas.height / 60) * Math.abs(seigyo_elements[sentaku].effect_temp[0]),(comp_canvas.height / 60) * Math.abs(seigyo_elements[sentaku].effect_temp[0]));
+    comp_canvas_ctx.moveTo(comp_canvas.width - (comp_canvas.height / 80) * Math.abs(seigyo_elements[sentaku].effect_temp[0]),(comp_canvas.height / 80) * Math.abs(seigyo_elements[sentaku].effect_temp[0]));
     comp_canvas_ctx.lineTo(0,comp_canvas.height);
     comp_canvas_ctx.stroke();
-
+    
     comp_canvas_ctx.beginPath();
     comp_canvas_ctx.strokeStyle = 'black';
-    comp_canvas_ctx.moveTo(comp_canvas.width - (comp_canvas.height / 60) * Math.abs(seigyo_elements[sentaku].effect_temp[0]),(comp_canvas.height / 60) * Math.abs(seigyo_elements[sentaku].effect_temp[0]));
-    comp_canvas_ctx.lineTo(comp_canvas.width,((comp_canvas.height / 60) * Math.abs(seigyo_elements[sentaku].effect_temp[0])) - (((comp_canvas.height / 60) * Math.abs(seigyo_elements[sentaku].effect_temp[0])) / seigyo_elements[sentaku].effect_temp[1]));
+    comp_canvas_ctx.moveTo(comp_canvas.width - (comp_canvas.height / 80) * Math.abs(seigyo_elements[sentaku].effect_temp[0]),(comp_canvas.height / 80) * Math.abs(seigyo_elements[sentaku].effect_temp[0]));
+    comp_canvas_ctx.lineTo(comp_canvas.width,((comp_canvas.height / 80) * Math.abs(seigyo_elements[sentaku].effect_temp[0])) - (((comp_canvas.height / 80) * Math.abs(seigyo_elements[sentaku].effect_temp[0])) / seigyo_elements[sentaku].effect_temp[1]));
     comp_canvas_ctx.stroke();
-
+    
     comp_canvas_ctx.beginPath();
     comp_canvas_ctx.strokeStyle = 'orangered';
-    comp_canvas_ctx.moveTo(0,(comp_canvas.height / 60) * Math.abs(seigyo_elements[sentaku].effect_temp[0]));
-    comp_canvas_ctx.lineTo(comp_canvas.width,(comp_canvas.height / 60) * Math.abs(seigyo_elements[sentaku].effect_temp[0]));
+    comp_canvas_ctx.moveTo(0,(comp_canvas.height / 80) * Math.abs(seigyo_elements[sentaku].effect_temp[0]));
+    comp_canvas_ctx.lineTo(comp_canvas.width,(comp_canvas.height / 80) * Math.abs(seigyo_elements[sentaku].effect_temp[0]));
     comp_canvas_ctx.stroke();
   }
 }
@@ -541,19 +541,19 @@ var comp_canvas_ctx = comp_canvas.getContext('2d');
 var zahyou_sa = (comp_canvas_text.height - comp_canvas.height) / 2; //グラフを描画するcanvasとテキストとグリッドを表示するcanvasの間にできる空白の大きさ
 
 comp_canvas_text_ctx.beginPath();
-comp_canvas_text_ctx.strokeStyle = 'red';
-for(var i = 0 ; i < 4 ; i++){
-  comp_canvas_text_ctx.moveTo(zahyou_sa,zahyou_sa + (comp_canvas.height / 3) * i);
-  comp_canvas_text_ctx.lineTo(zahyou_sa + comp_canvas.width,zahyou_sa + (comp_canvas.height / 3) * i);
+comp_canvas_text_ctx.strokeStyle = "rgb(255,150,150)";
+for(var i = 0 ; i < 5 ; i++){
+  comp_canvas_text_ctx.moveTo(zahyou_sa,zahyou_sa + (comp_canvas.height / 4) * i);
+  comp_canvas_text_ctx.lineTo(zahyou_sa + comp_canvas.width,zahyou_sa + (comp_canvas.height / 4) * i);
   comp_canvas_text_ctx.font = '11pt sans-serif';
   var measure = comp_canvas_text_ctx.measureText( -20 * i );
-  comp_canvas_text_ctx.fillText( -20 * i , zahyou_sa - 30 - (measure.width / 2), zahyou_sa + (comp_canvas.height / 3) * i);
+  comp_canvas_text_ctx.fillText( -20 * i , zahyou_sa - 30 - (measure.width / 2), zahyou_sa + (comp_canvas.height / 4) * i);
 
-  comp_canvas_text_ctx.moveTo(zahyou_sa + (comp_canvas.width / 3) * i,zahyou_sa);
-  comp_canvas_text_ctx.lineTo(zahyou_sa + (comp_canvas.width / 3) * i,zahyou_sa + comp_canvas.height);
+  comp_canvas_text_ctx.moveTo(zahyou_sa + (comp_canvas.width / 4) * i,zahyou_sa);
+  comp_canvas_text_ctx.lineTo(zahyou_sa + (comp_canvas.width / 4) * i,zahyou_sa + comp_canvas.height);
   comp_canvas_text_ctx.font = '11pt sans-serif';
   var measure = comp_canvas_text_ctx.measureText( -20 * i );
-  comp_canvas_text_ctx.fillText( -20 * i , comp_canvas_text.width - zahyou_sa - (measure.width / 2) + (comp_canvas.width / 3) * -i ,comp_canvas_text.height - zahyou_sa + 30);
+  comp_canvas_text_ctx.fillText( -20 * i , comp_canvas_text.width - zahyou_sa - (measure.width / 2) + (comp_canvas.width / 4) * -i ,comp_canvas_text.height - zahyou_sa + 30);
 }
 
 var measure = comp_canvas_text_ctx.measureText( "[db]" );
@@ -563,20 +563,20 @@ comp_canvas_text_ctx.stroke();
 
 comp_canvas_ctx.beginPath();
 comp_canvas_ctx.strokeStyle = 'black';
-comp_canvas_ctx.moveTo(comp_canvas.width - (comp_canvas.height / 60) * Math.abs(seigyo_elements[sentaku].effect_temp[0]),(comp_canvas.height / 60) * Math.abs(seigyo_elements[sentaku].effect_temp[0]));
+comp_canvas_ctx.moveTo(comp_canvas.width - (comp_canvas.height / 80) * Math.abs(seigyo_elements[sentaku].effect_temp[0]),(comp_canvas.height / 80) * Math.abs(seigyo_elements[sentaku].effect_temp[0]));
 comp_canvas_ctx.lineTo(0,comp_canvas.height);
 comp_canvas_ctx.stroke();
 
 comp_canvas_ctx.beginPath();
 comp_canvas_ctx.strokeStyle = 'black';
-comp_canvas_ctx.moveTo(comp_canvas.width - (comp_canvas.height / 60) * Math.abs(seigyo_elements[sentaku].effect_temp[0]),(comp_canvas.height / 60) * Math.abs(seigyo_elements[sentaku].effect_temp[0]));
-comp_canvas_ctx.lineTo(comp_canvas.width,((comp_canvas.height / 60) * Math.abs(seigyo_elements[sentaku].effect_temp[0])) - (((comp_canvas.height / 60) * Math.abs(seigyo_elements[sentaku].effect_temp[0])) / seigyo_elements[sentaku].effect_temp[1]));
+comp_canvas_ctx.moveTo(comp_canvas.width - (comp_canvas.height / 80) * Math.abs(seigyo_elements[sentaku].effect_temp[0]),(comp_canvas.height / 80) * Math.abs(seigyo_elements[sentaku].effect_temp[0]));
+comp_canvas_ctx.lineTo(comp_canvas.width,((comp_canvas.height / 80) * Math.abs(seigyo_elements[sentaku].effect_temp[0])) - (((comp_canvas.height / 80) * Math.abs(seigyo_elements[sentaku].effect_temp[0])) / seigyo_elements[sentaku].effect_temp[1]));
 comp_canvas_ctx.stroke();
 
 comp_canvas_ctx.beginPath();
 comp_canvas_ctx.strokeStyle = 'orangered';
-comp_canvas_ctx.moveTo(0,(comp_canvas.height / 60) * Math.abs(seigyo_elements[sentaku].effect_temp[0]));
-comp_canvas_ctx.lineTo(comp_canvas.width,(comp_canvas.height / 60) * Math.abs(seigyo_elements[sentaku].effect_temp[0]));
+comp_canvas_ctx.moveTo(0,(comp_canvas.height / 80) * Math.abs(seigyo_elements[sentaku].effect_temp[0]));
+comp_canvas_ctx.lineTo(comp_canvas.width,(comp_canvas.height / 80) * Math.abs(seigyo_elements[sentaku].effect_temp[0]));
 comp_canvas_ctx.stroke();
 //ここまでグラフの描画
 
@@ -587,7 +587,7 @@ var meter_canvas_text = document.querySelector('#meter_canvas_text');
 var meter_canvas_text_ctx = meter_canvas_text.getContext('2d');
 //ここからグリッドとテキスト
 meter_canvas_text_ctx.beginPath();
-meter_canvas_text_ctx.strokeStyle = 'red';
+meter_canvas_text_ctx.strokeStyle = "rgb(255,150,150)";
 var answer;
 var y_temp;
 for(var i = 0 ; i < 6 ; i++){

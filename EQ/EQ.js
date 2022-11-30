@@ -95,7 +95,7 @@ class seigyo{ //audiocontextとボリュームのノードとEQのノードの�
             max_audio = i; //一番再生時間が長い音源が何番目なのかの変数
           }
         }
-      }.bind(this),500);
+      }.bind(this),200);
     }
     else{
       setTimeout(function(){
