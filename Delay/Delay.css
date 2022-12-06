@@ -1,25 +1,16 @@
 .effect_object{
     display: flex;
 }
-#comp_canvas{
-    position: absolute;
-    transform: translate(50px,50px);
-}
-#meter_canvas{
-    position: absolute;
-    transform: translate(50px,50px);
-    /*border: solid 1px #000000;*/
-}
 .effects_view{
     margin-top: 15px;
 }
 .volume_pan{
     margin:4px;
 }
-.comp{
+.delay{
     margin: 4px;
 }
-.comp #effects{
+.delay #effects{
     display: inline-block;
     text-align: center;
     width: 70px;
@@ -31,7 +22,7 @@
 .effects_view #effects{
     display: inline-block;
     text-align: right;
-    width: 100px;
+    width: 120px;
 }
 .effects_view .sentaku_audio_div{
     margin:0 auto;
