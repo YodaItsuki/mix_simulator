@@ -17,8 +17,32 @@ class seigyo{ //audiocontextとボリュームのノードとエフェクター�
     }
   }
 
+  timeset(duration){ //再生位置の調整スライダーの値を変える
+    if(saiseiichi.max == 0){
+      saiseiichi.max = duration;
+      for(var i = 0 ; i < audio.length ; i++){
+        if(saiseiichi.max == audio[i].duration){
+          max_audio = i; //一番再生時間が長い音源が何番目なのかの変数
+        }
+      }
+    }
+    else{
+      if(saiseiichi.max < duration){ //もし読み込んだ音源が再生位置のスライダーの最大の値を超えた場合
+        saiseiichi.max = duration; //再生位置のスライダーの最大の値変える
+      }
+      for(var i = 0 ; i < audio.length ; i++){
+        if(saiseiichi.max == audio[i].duration){ //すべての音源と比較して読み込んだ音源の時間が一番長いときの動作
+          max_audio = i;
+        }
+      }
+    }
+  }
+
   touroku(element,sentaku){
     this.audio = element.querySelector('#audio');
+    this.audio.onloadedmetadata = function() {
+      this.timeset(element.querySelector('#audio').duration);
+    }.bind(this);
     this.filesousin = element.querySelector('#filesousin');
     this.kirikae = element.querySelector('#kirikae');
     this.effect_switch = element.querySelector('#effect_switch');
@@ -93,26 +117,6 @@ class seigyo{ //audiocontextとボリュームのノードとエフェクター�
     if(douji.disabled == true){ //再生が操作不可の時の動作
       douji.disabled = false; //再生をボタンを押せるようにする
       saiseiichi.disabled = false; //再生位置を調整できるようにする
-      setTimeout(function(){ //音源の再生時間を読み込めるように少し遅延をかける
-        saiseiichi.max = this.audio.duration;
-        for(var i = 0 ; i < audio.length ; i++){
-          if(saiseiichi.max == audio[i].duration){
-            max_audio = i; //一番再生時間が長い音源が何番目なのかの変数
-          }
-        }
-      }.bind(this),200);
-    }
-    else{
-      setTimeout(function(){
-        if(saiseiichi.max < this.audio.duration){ //もし読み込んだ音源が再生位置のスライダーの最大の値を超えた場合
-          saiseiichi.max = this.audio.duration //再生位置のスライダーの最大の値変える
-        }
-        for(var i = 0 ; i < audio.length ; i++){
-          if(saiseiichi.max == audio[i].duration){ //すべての音源と比較して読み込んだ音源の時間が一番長いときの動作
-            max_audio = i;
-          }
-        }
-      }.bind(this),200);
     }
   }
 
