@@ -1,5 +1,5 @@
 class seigyo{ //audiocontextとボリュームのノードとエフェクターのノードのクラス
-  constructor(audioCtx,gainNode,effectnode,analyserNode_before,analyserNode_after,Pannode,feedback){
+  constructor(audioCtx,gainNode,effectnode,analyserNode_before,analyserNode_after,Pannode,feedback,preset_temp,preset_name){
     this.audioCtx = audioCtx;
     this.gainNode = gainNode;
     this.effectnode = effectnode;
@@ -7,7 +7,13 @@ class seigyo{ //audiocontextとボリュームのノードとエフェクター�
     this.Pannode = Pannode;
     this.analyserNode_before = analyserNode_before;
     this.analyserNode_after = analyserNode_after;
-    this.effect_temp = [0.1,0.5]; //パラメーターの値を保存する変数 エフェクトオンオフの時に使う 0ディレイタイム 1減衰値
+    this.name = preset_name;
+    if(preset_temp != undefined){
+      this.effect_temp = preset_temp; //EQのgainの値を保存する変数 エフェクトオンオフの時に使う
+    }
+    else{
+      this.effect_temp = [0.1,0];
+    }
   }
 
   touroku(element,sentaku){
@@ -36,6 +42,7 @@ class seigyo{ //audiocontextとボリュームのノードとエフェクター�
     this.solo_button.addEventListener( 'click', () => {this.solo()} );
     this.sentaku = sentaku; //配列内の何番目のインスタンスなのか
     this.sousakinshi = false; //エフェクターが操作禁止かどうかを判定する変数 falseが操作できる trueが操作不可
+    this.sousin();
   }
 
   sousin(url) { //ファイルを選択したときの動作 audioタグのsrcに入れて各ノードを接続
@@ -44,7 +51,10 @@ class seigyo{ //audiocontextとボリュームのノードとエフェクター�
       audio[i].currentTime = 0; 
     }
     douji.value = "再生";
-    this.audio.src = url;
+    saisei_flag = false;
+    if(url != undefined){
+      this.audio.src = url;
+    }
     if(this.source == null){
       this.source = this.audioCtx.createMediaElementSource(this.audio); //ノード作成
     }
@@ -209,35 +219,6 @@ class effectset{ //エフェクトを操作するクラス
 
 //ここまでクラス
 
-window.AudioContext = window.AudioContext || window.webkitAudioContext;
-var number_of_seigyo = 6; //制御する音源の数
-var seigyo_elements = new Array(number_of_seigyo); //音源の制御する配列
-for(var i = 0; i < number_of_seigyo; i++) {
-  var audioCtx = new AudioContext();
-  var gainNode = audioCtx.createGain(); //ボリュームを変えるノードを作成
-  var Pannode = audioCtx.createStereoPanner(); //パンのノード
-
-  var analyserNode_before = audioCtx.createAnalyser(); //エフェクターで効果を与える前のアナライザー
-  analyserNode_before.fftSize = 2048;
-
-  var analyserNode_after = audioCtx.createAnalyser(); //エフェクターで効果を与えた後のアナライザー
-  analyserNode_after.fftSize = 2048;
-  var effectnode = audioCtx.createDelay();
-  var feedback = audioCtx.createGain();
-  effectnode.delayTime.value = 0.1;
-  seigyo_elements[i] = new seigyo(audioCtx,gainNode,effectnode,analyserNode_before,analyserNode_after,Pannode,feedback); //音源の制御のインスタンスを格納
-}
-
-var sentaku = 0; //いまどの音源を操作するのかの値
-var source = new Array(number_of_seigyo);
-var url; //src
-
-var i = 0;
-for( let element of document.querySelectorAll('.seigyo') ) { //インスタンスを生成
-  seigyo_elements[i].touroku( element,i );
-  i++;
-}
-
 var audio = []
 var douji = document.querySelector('#douji');
 var saiseijikan = document.querySelector('#saiseijikan');
@@ -297,76 +278,75 @@ saiseiichi.addEventListener('input', function( event ) { //再生位置のスラ
 });
 
 var volume = document.querySelector('#volume');
+var volumedb = document.querySelector('#volumedb');
 volume.addEventListener('input', function( event ) { //volumeのスライダーを動かしたときの動作
   seigyo_elements[sentaku].gainNode.gain.value = volume.value;
   seigyo_elements[sentaku].volume_temp = volume.value; //ボリュームの値の一時保存 ミュートとソロの時に使う
-  console.log(seigyo_elements[sentaku].volume_temp);
+  volumedb.textContent = Math.round(volume.value * 100);
 });
 
 var pan = document.querySelector('#pan');
+var direction = document.querySelector('#direction');
 pan.addEventListener('input', function( event ) { //panのスライダーを動かしたときの動作
   seigyo_elements[sentaku].Pannode.pan.value = pan.value;
+  if(pan.value == 0){
+    direction.textContent = "C";
+  }
+  else if(pan.value < 0){
+    direction.textContent = "L" + Math.round(Math.abs(pan.value) * 100);
+  }
+  else{
+    direction.textContent = "R" + Math.round(pan.value * 100);
+  }
 });
 
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
+var number_of_seigyo = 6; //制御する音源の数
+var seigyo_elements = new Array(number_of_seigyo); //音源の制御する配列
+
+var preset = []; //demoのプリセットを格納する配列
+preset[0] = [0.1,0];
+preset[1] = [0.1,0]; 
+preset[2] = [0.1,0];
+preset[3] = [0.1,0];
+preset[4] = [0.1,0];
+var preset_name = ["Vocal.mp3","Drums.mp3","Piano.mp3","Guitar.mp3","Bass.mp3"];
+
+for(var i = 0; i < number_of_seigyo; i++) {
+  var audioCtx = new AudioContext();
+  var gainNode = audioCtx.createGain(); //ボリュームを変えるノードを作成
+  var Pannode = audioCtx.createStereoPanner(); //パンのノード
+
+  var analyserNode_before = audioCtx.createAnalyser(); //エフェクターで効果を与える前のアナライザー
+  analyserNode_before.fftSize = 2048;
+
+  var analyserNode_after = audioCtx.createAnalyser(); //エフェクターで効果を与えた後のアナライザー
+  analyserNode_after.fftSize = 2048;
+  var effectnode = audioCtx.createDelay();
+  var feedback = audioCtx.createGain();
+  effectnode.delayTime.value = 0.1;
+
+  if(preset_temp != undefined){
+    effectnode.delayTime.value = preset_temp[0];
+    feedback.gain.value = preset_temp[1];
+  }
+  else{
+    effectnode.delayTime.value = 0.1;
+    feedback.gain.value = 0;
+  }
+
+  var preset_temp = preset[i]; //presetの中の配列を取り出す
+  seigyo_elements[i] = new seigyo(audioCtx,gainNode,effectnode,analyserNode_before,analyserNode_after,Pannode,feedback,preset_temp,preset_name[i]); //音源の制御のインスタンスを格納
+}
+
+var sentaku = 0; //いまどの音源を操作するのかの値
+var source = new Array(number_of_seigyo);
+var url; //src
+
+var i = 0;
+for( let element of document.querySelectorAll('.seigyo') ) { //インスタンスを生成
+  seigyo_elements[i].touroku( element,i );
+  i++;
+}
+
 let effect_set = new effectset(); //エフェクトを操作するインスタンス
-
-//ここからアナライザーの描画
-/*
-
-var analizer_canvas = document.querySelector('#analizer_canvas');
-var analizer_canvas_ctx = analizer_canvas.getContext('2d');
-window.setInterval(function() { //描画を繰り返す
-  var spectrums_before = new Uint8Array(1024);
-  seigyo_elements[sentaku].analyserNode_before.getByteFrequencyData(spectrums_before);
-  analizer_canvas_ctx.clearRect(0, 0, analizer_canvas.width, analizer_canvas.height);
-  analizer_canvas_ctx.beginPath();
-  analizer_canvas_ctx.strokeStyle = 'rgb( 0, 0, 0)';
-  for (var i = 1, len = 929; i <= len; i++) { //1番目が大体20Hz 929番目が大体20kHz
-    if(i < 3){ x = ((analizer_canvas.width / 8) / 2) * (i - 1); } //60Hzまでのx
-    else if(i < 5){ x = (analizer_canvas.width / 8) + ((analizer_canvas.width / 8) / 2) * (i - 3); } //100Hzまでのx
-    else if(i < 9){ x = (analizer_canvas.width / 8) * 2 + ((analizer_canvas.width / 8) / 4) * (i - 5); } //200Hzまでのx
-    else if(i < 23){ x = (analizer_canvas.width / 8) * 3 + ((analizer_canvas.width / 8) / 14) * (i - 9); } //500Hzまでのx
-    else if(i < 46){ x = (analizer_canvas.width / 8) * 4 + ((analizer_canvas.width / 8) / 23) * (i - 23); } //1000Hzまでのx
-    else if(i < 93){ x = (analizer_canvas.width / 8) * 5 + ((analizer_canvas.width / 8) / 47) * (i - 46); } //2000Hzまでのx
-    else if(i < 232){ x = (analizer_canvas.width / 8) * 6 + ((analizer_canvas.width / 8) / 139) * (i - 93); } //5000Hzまでのx
-    else if(i < 464){ x = (analizer_canvas.width / 8) * 7 + ((analizer_canvas.width / 8) / 232) * (i - 232); } //10000Hzまでのx
-    else if(i <= 929){ x = (analizer_canvas.width / 8) * 8 + ((analizer_canvas.width / 8) / 466) * (i - 464); } //20000Hzまでのx
-
-    var y = (1 - (spectrums_before[i] / 255)) * analizer_canvas.height;
-
-    if (i === 0) {
-      analizer_canvas_ctx.moveTo(x, y);
-    } else {
-        analizer_canvas_ctx.lineTo(x, y);
-    }
-  }
-  analizer_canvas_ctx.stroke();
-
-  var spectrums_after = new Uint8Array(1024);
-  seigyo_elements[sentaku].analyserNode_after.getByteFrequencyData(spectrums_after);
-  analizer_canvas_ctx.beginPath();
-  analizer_canvas_ctx.strokeStyle = 'rgb( 255, 0, 0)';
-  for (var i = 1, len = 929; i <= len; i++) {
-    if(i < 3){ x = ((analizer_canvas.width / 8) / 2) * (i - 1); } //60Hzまでのx
-    else if(i < 5){ x = (analizer_canvas.width / 8) + ((analizer_canvas.width / 8) / 2) * (i - 3); } //100Hzまでのx
-    else if(i < 9){ x = (analizer_canvas.width / 8) * 2 + ((analizer_canvas.width / 8) / 4) * (i - 5); } //200Hzまでのx
-    else if(i < 23){ x = (analizer_canvas.width / 8) * 3 + ((analizer_canvas.width / 8) / 14) * (i - 9); } //500Hzまでのx
-    else if(i < 46){ x = (analizer_canvas.width / 8) * 4 + ((analizer_canvas.width / 8) / 23) * (i - 23); } //1000Hzまでのx
-    else if(i < 93){ x = (analizer_canvas.width / 8) * 5 + ((analizer_canvas.width / 8) / 47) * (i - 46); } //2000Hzまでのx
-    else if(i < 232){ x = (analizer_canvas.width / 8) * 6 + ((analizer_canvas.width / 8) / 139) * (i - 93); } //5000Hzまでのx
-    else if(i < 464){ x = (analizer_canvas.width / 8) * 7 + ((analizer_canvas.width / 8) / 232) * (i - 232); } //10000Hzまでのx
-    else if(i <= 929){ x = (analizer_canvas.width / 8) * 8 + ((analizer_canvas.width / 8) / 466) * (i - 464); } //20000Hzまでのx
-
-    var y = (1 - (spectrums_after[i] / 255)) * analizer_canvas.height;
-
-    if (i === 0) {
-      analizer_canvas_ctx.moveTo(x, y);
-    } else {
-      analizer_canvas_ctx.lineTo(x, y);
-    }
-  }
-  analizer_canvas_ctx.stroke();
-}, 50);
-
-//ここまでアナライザーの描画
-*/

@@ -478,7 +478,7 @@ var seigyo_elements = new Array(number_of_seigyo); //音源の制御する配列
 
 var preset = []; //demoのプリセットを格納する配列
 preset[0] = [0,2,0.003,0.25];
-preset[1] = [0,2,0.003,0.25];
+preset[1] = [0,2,0.003,0.25]; 
 preset[2] = [0,2,0.003,0.25];
 preset[3] = [0,2,0.003,0.25];
 preset[4] = [0,2,0.003,0.25];
@@ -515,8 +515,6 @@ for(var i = 0; i < number_of_seigyo; i++) {
     effectnode.knee.value = 40;
   }
 
-  effectnode.threshold.value = 0;
-  effectnode.knee.value = 0;
   var preset_temp = preset[i]; //presetの中の配列を取り出す
   seigyo_elements[i] = new seigyo(audioCtx,gainNode,effectnode,analyserNode_before,analyserNode_after,Pannode,preset_temp,preset_name[i]); //音源の制御のインスタンスを格納
 }
