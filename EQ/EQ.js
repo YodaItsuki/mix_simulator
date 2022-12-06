@@ -20,6 +20,9 @@ class seigyo{ //audiocontextとボリュームのノードとEQのノードの�
 
   touroku(element,sentaku){
     this.audio = element.querySelector('#audio');
+    this.audio.onloadedmetadata = function() {
+      this.timeset(element.querySelector('#audio').duration);
+    }.bind(this);
     this.filesousin = element.querySelector('#filesousin');
     this.kirikae = element.querySelector('#kirikae');
     this.effect_switch = element.querySelector('#effect_switch');
@@ -49,7 +52,6 @@ class seigyo{ //audiocontextとボリュームのノードとEQのノードの�
     this.mute_button.addEventListener( 'click', () => {this.mute()} );
     this.solo_button.addEventListener( 'click', () => {this.solo()} );
     this.reset_button.addEventListener( 'click', () => {this.reset()} );
-    //this.bands = bands;
     this.sentaku = sentaku; //配列内の何番目のインスタンスなのか
     this.sousakinshi = false; //EQが操作禁止かどうかを判定する変数 falseが操作できる trueが操作不可
     this.sousin();
@@ -88,17 +90,17 @@ class seigyo{ //audiocontextとボリュームのノードとEQのノードの�
     if(douji.disabled == true){ //再生が操作不可の時の動作
       douji.disabled = false; //再生をボタンを押せるようにする
       saiseiichi.disabled = false; //再生位置を調整できるようにする
-      setTimeout(function(){ //音源の再生時間を読み込めるように少し遅延をかける
+      /*setTimeout(function(){ //音源の再生時間を読み込めるように少し遅延をかける
         saiseiichi.max = this.audio.duration;
         for(var i = 0 ; i < audio.length ; i++){
           if(saiseiichi.max == audio[i].duration){
             max_audio = i; //一番再生時間が長い音源が何番目なのかの変数
           }
         }
-      }.bind(this),200);
+      }.bind(this),200);*/
     }
     else{
-      setTimeout(function(){
+      /*setTimeout(function(){
         if(saiseiichi.max < this.audio.duration){ //もし読み込んだ音源が再生位置のスライダーの最大の値を超えた場合
           saiseiichi.max = this.audio.duration; //再生位置のスライダーの最大の値変える
         }
@@ -107,7 +109,28 @@ class seigyo{ //audiocontextとボリュームのノードとEQのノードの�
             max_audio = i;
           }
         }
-      }.bind(this),200);
+      }.bind(this),200);*/
+    }
+  }
+
+  timeset(duration){ //時間調整
+    if(saiseiichi.max == 0){
+      saiseiichi.max = duration;
+      for(var i = 0 ; i < audio.length ; i++){
+        if(saiseiichi.max == audio[i].duration){
+          max_audio = i; //一番再生時間が長い音源が何番目なのかの変数
+        }
+      }
+    }
+    else{
+      if(saiseiichi.max < duration){ //もし読み込んだ音源が再生位置のスライダーの最大の値を超えた場合
+        saiseiichi.max = duration; //再生位置のスライダーの最大の値変える
+      }
+      for(var i = 0 ; i < audio.length ; i++){
+        if(saiseiichi.max == audio[i].duration){ //すべての音源と比較して読み込んだ音源の時間が一番長いときの動作
+          max_audio = i;
+        }
+      }
     }
   }
 
@@ -242,18 +265,18 @@ class seigyo{ //audiocontextとボリュームのノードとEQのノードの�
       }
       for(var i = 0; i < audio.length; i++){
         if(audio[i].src != ""){
-          saiseiichi.max = 0; //いったん再生位置のinputの最大値を0にしておく
+          //saiseiichi.max = 0; //いったん再生位置のinputの最大値を0にしておく
           for(var i = 0; i < audio.length; i++){
-            if(saiseiichi.max < audio[i].duration){
-              saiseiichi.max = audio[i].duration;
-            }
+            //if(saiseiichi.max < audio[i].duration){
+              //saiseiichi.max = audio[i].duration;
+            //}
           }
           for(var i = 0; i < audio.length; i++){
             audio[i].pause();
             audio[i].currentTime = 0;  //いったんすべての音源を停止して再生位置を0に戻す
-            if(saiseiichi.max == audio[i].duration){
-              max_audio = i;
-            }
+            //if(saiseiichi.max == audio[i].duration){
+              //max_audio = i;
+            //}
           }
           saisei_flag = false;
           douji.value = "再生";
@@ -366,7 +389,6 @@ volume.addEventListener('input', function( event ) { //volumeのスライダー�
   seigyo_elements[sentaku].gainNode.gain.value = volume.value;
   seigyo_elements[sentaku].volume_temp = volume.value; //ボリュームの値の一時保存 ミュートとソロの時に使う
   volumedb.textContent = Math.round(volume.value * 100);
-  //console.log(seigyo_elements[sentaku].volume_temp);
 });
 
 var pan = document.querySelector('#pan');

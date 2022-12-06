@@ -9,7 +9,7 @@ class seigyo{ //audiocontextとボリュームのノードとエフェクター�
     this.analyserNode_after = analyserNode_after;
     this.name = preset_name;
     if(preset_temp != undefined){
-      this.effect_temp = preset_temp; //EQのgainの値を保存する変数 エフェクトオンオフの時に使う
+      this.effect_temp = preset_temp; //エフェクターの値を保存する変数 エフェクトオンオフの時に使う
     }
     else{
       this.effect_temp = [0.1,0];
@@ -23,6 +23,10 @@ class seigyo{ //audiocontextとボリュームのノードとエフェクター�
     this.effect_switch = element.querySelector('#effect_switch');
     this.mute_button = element.querySelector('#mute');
     this.solo_button = element.querySelector('#solo');
+    this.reset_button = element.querySelector('#reset');
+    this.audio_name = element.querySelector('#audio_name');
+    this.select_mark = element.querySelector('#select_mark'); //現在選択している音源のマークの表示
+    this.select_mark.style.color = "red";
     this.volume_temp = 1; //ボリュームの値の一時保存の変数　ミュートとソロの時に使う
     this.mute_flag = false; //ミュートの判定のフラグ
     this.solo_flag = false; //ソロの判定のフラグ
@@ -40,6 +44,7 @@ class seigyo{ //audiocontextとボリュームのノードとエフェクター�
     this.effect_switch.addEventListener( 'click', () => {this.switch()} );
     this.mute_button.addEventListener( 'click', () => {this.mute()} );
     this.solo_button.addEventListener( 'click', () => {this.solo()} );
+    this.reset_button.addEventListener( 'click', () => {this.reset()} );
     this.sentaku = sentaku; //配列内の何番目のインスタンスなのか
     this.sousakinshi = false; //エフェクターが操作禁止かどうかを判定する変数 falseが操作できる trueが操作不可
     this.sousin();
@@ -50,6 +55,8 @@ class seigyo{ //audiocontextとボリュームのノードとエフェクター�
       audio[i].pause();
       audio[i].currentTime = 0; 
     }
+    this.audio_name.textContent = this.name;
+    sentaku_audio.textContent = seigyo_elements[sentaku].name;
     douji.value = "再生";
     saisei_flag = false;
     if(url != undefined){
@@ -98,32 +105,47 @@ class seigyo{ //audiocontextとボリュームのノードとエフェクター�
     }
   }
 
-  switch(){ //エフェクトオフ・オンを押したときの動作
-    if(this.effect_switch.value == "エフェクトオフ"){ //エフェクトオフ・オンのボタンがエフェクトオフの時
+  switch(){ //Bypassを押したときの動作
+    if(this.sousakinshi == false){ //エフェクトオフ・オンのボタンがエフェクトオフの時
       this.feedback.gain.value = 0;
       if(this.sentaku == sentaku){ //エフェクトを適応する音源を選択して、その選択中の音源のエフェクトをオンオフするときだけ変更する
         effect_set.delay_time.disabled = true; //スライダーを操作不能にする
         effect_set.gensui.disabled = true;
       }
       this.sousakinshi = true; //エフェクターが操作できるかどうかのフラグをtrueにする
-      this.effect_switch.value = "エフェクトオン" //ボタンの文字を変える
+      this.effect_switch.style.backgroundColor = "red";
+      this.effect_switch.style.color = "white";
     }
-    else if(this.effect_switch.value == "エフェクトオン"){ //エフェクトオフ・オンのボタンがエフェクトオンの時
+    else if(this.sousakinshi == true){ //エフェクトオフ・オンのボタンがエフェクトオンの時
       this.feedback.gain.value = this.effect_temp[1];
       if(this.sentaku == sentaku){
         effect_set.delay_time.disabled = false; //スライダーを操作できるようにする
         effect_set.gensui.disabled = false;
       }
+      this.effect_switch.style.backgroundColor = "#F0F0F0";
+      this.effect_switch.style.color = "black";
       this.sousakinshi = false; //エフェクターが操作できるかどうかのフラグをfalseにする
-      this.effect_switch.value = "エフェクトオフ" //ボタンの文字を変える
     }
   }
 
   kirikaeru() { //切り替えを押したときの動作
+    seigyo_elements[sentaku].select_mark.textContent = "";
     sentaku = this.sentaku; //どれを操作しているかをこのインスタンスの配列の番号にする
     //各エフェクターの値をその音源の値にする
+    this.select_mark.textContent = "●";
+    sentaku_audio.textContent = this.name;
     volume.value = this.volume_temp;
+    volumedb.textContent = Math.round(volume.value * 100);
     pan.value = this.Pannode.pan.value;
+    if(pan.value == 0){
+      direction.textContent = "C";
+    }
+    else if(pan.value < 0){
+      direction.textContent = "L" + Math.round(Math.abs(pan.value) * 100);
+    }
+    else{
+      direction.textContent = "R" + Math.round(pan.value * 100);
+    }
     effect_set.delay_time.value = this.effect_temp[0];
     effect_set.gensui.value = this.effect_temp[1];
     effect_set.delay_time_view.textContent = this.effect_temp[0];
@@ -151,6 +173,8 @@ class seigyo{ //audiocontextとボリュームのノードとエフェクター�
       if(sentaku == this.sentaku){ //この音源が選択されているとき
         volume.disabled = true;
       }
+      this.mute_button.style.backgroundColor = "red";
+      this.mute_button.style.color = "white";
       this.mute_flag = true; //ミュートしてるかどうかのフラグをtrueに変える
     }
     else{
@@ -158,6 +182,8 @@ class seigyo{ //audiocontextとボリュームのノードとエフェクター�
       if(sentaku == this.sentaku){ //この音源が選択されているとき
         volume.disabled = false;
       }
+      this.mute_button.style.backgroundColor = "#F0F0F0";
+      this.mute_button.style.color = "black";
       this.mute_flag = false; //フラグをfalseに変える
     }
   }
@@ -171,6 +197,8 @@ class seigyo{ //audiocontextとボリュームのノードとエフェクター�
           seigyo_elements[i].solo_button.disabled = true; //iの音源のソロのボタンを操作不可にする
         }
       }
+      this.solo_button.style.backgroundColor = "red";
+      this.solo_button.style.color = "white";
       this.solo_flag = true; //ソロを判定するフラグをtrueに変える
     }
     else{
@@ -186,8 +214,62 @@ class seigyo{ //audiocontextとボリュームのノードとエフェクター�
           seigyo_elements[i].solo_button.disabled = false;//iの音源のソロのボタンを操作できるようにする
         }
       }
+      this.solo_button.style.backgroundColor = "#F0F0F0";
+      this.solo_button.style.color = "black";
       this.solo_flag = false; //ソロを判定するフラグをfalseにする
     }
+  }
+
+  reset(){
+    this.result = confirm("トラックをリセットします。よろしいですか？")
+    if( this.result ) {
+      //audioのsrcを空にして表示を消す
+      this.audio.src = "";
+      this.audio_name.textContent = "";
+      this.name = "";
+      if(sentaku == this.sentaku){
+        sentaku_audio.textContent = "";
+      }
+      for(var i = 0; i < audio.length; i++){
+        if(audio[i].src != ""){
+          saiseiichi.max = 0; //いったん再生位置のinputの最大値を0にしておく
+          for(var i = 0; i < audio.length; i++){
+            if(saiseiichi.max < audio[i].duration){
+              saiseiichi.max = audio[i].duration;
+            }
+          }
+          for(var i = 0; i < audio.length; i++){
+            audio[i].pause();
+            audio[i].currentTime = 0;  //いったんすべての音源を停止して再生位置を0に戻す
+            if(saiseiichi.max == audio[i].duration){
+              max_audio = i;
+            }
+          }
+          saisei_flag = false;
+          douji.value = "再生";
+          this.effectnode.delayTime.value = 0.1;
+          this.feedback.gain.value = 0;
+          this.effect_temp[0] = 0.1
+          this.effect_temp[1] = 0;
+          this.gainNode.gain.value = 1;
+          this.volume_temp = 1;
+          this.Pannode.pan.value = 0;
+          if(sentaku == this.sentaku){ //この音源が選択されているとき
+            //スライダーと文字をデフォルトに戻す
+            effect_set.delay_time.value = 0.1;
+            effect_set.gensui.value = 0;
+            effect_set.delay_time_view.textContent = 0.1;
+            effect_set.gensui_view.textContent = 0;
+            volume.value = 1;
+            pan.value = 0;
+            volumedb.textContent = 100;
+            direction.textContent = "C";
+          }
+          break;
+        }
+      }
+    }
+  else {}
   }
 }
 
@@ -200,6 +282,10 @@ class effectset{ //エフェクトを操作するクラス
     this.delay_time.addEventListener( 'input', () => {this.delay_timeset()} ); //スレショルドのスライダーを動かしたときの動作
     this.gensui.addEventListener( 'input', () => {this.gensuiset()} );
     this.sentaku = 0; //エフェクターを適応する音源の選択、デフォルトで一つ目の音源が選択されている
+    this.delay_time.value = seigyo_elements[0].effect_temp[0]; //プリセットに書き換える
+    this.delay_time_view.textContent = seigyo_elements[0].effect_temp[0];
+    this.gensui.value = seigyo_elements[0].effect_temp[1];
+    this.gensui_view.textContent = seigyo_elements[0].effect_temp[1];
   }
 
   delay_timeset() {
@@ -324,8 +410,8 @@ for(var i = 0; i < number_of_seigyo; i++) {
   analyserNode_after.fftSize = 2048;
   var effectnode = audioCtx.createDelay();
   var feedback = audioCtx.createGain();
-  effectnode.delayTime.value = 0.1;
 
+  var preset_temp = preset[i]; //presetの中の配列を取り出す
   if(preset_temp != undefined){
     effectnode.delayTime.value = preset_temp[0];
     feedback.gain.value = preset_temp[1];

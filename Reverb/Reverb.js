@@ -1,25 +1,20 @@
 class seigyo{ //audiocontextとボリュームのノードとエフェクターのノードのクラス
-  constructor(audioCtx,gainNode,effectnode,analyserNode_before,analyserNode_after,Pannode,wetgainnode,drygainnode){
+  constructor(audioCtx,gainNode,effectnode,analyserNode_before,analyserNode_after,Pannode,wetgainnode,drygainnode,preset_temp,preset_name){
     this.audioCtx = audioCtx;
     this.gainNode = gainNode;
-    this.effectnode = effectnode;
-    effectnode.then(
-      function onFulfilled(value){
-        this.effectnode = value;
-      }.bind(this),
-    
-      // 失敗時に呼び出される
-      function onRejected(reason){
-        console.log(reason);
-      }.bind(this)
-    );
     this.effectnode = effectnode;
     this.Pannode = Pannode;
     this.wetgainnode = wetgainnode;
     this.drygainnode = drygainnode;
     this.analyserNode_before = analyserNode_before;
     this.analyserNode_after = analyserNode_after;
-    this.effect_temp = [0,1]; //パラメーターの値を保存する変数 エフェクトオンオフの時に使う 0wet 1dry
+    this.name = preset_name;
+    if(preset_temp != undefined){
+      this.effect_temp = preset_temp; //パラメーターの値を保存する変数 エフェクトオンオフの時に使う 0wet 1dry
+    }
+    else{
+      this.effect_temp = [0.1,1]; //パラメーターの値を保存する変数 エフェクトオンオフの時に使う 0wet 1dry
+    }
   }
 
   touroku(element,sentaku){
@@ -29,6 +24,10 @@ class seigyo{ //audiocontextとボリュームのノードとエフェクター�
     this.effect_switch = element.querySelector('#effect_switch');
     this.mute_button = element.querySelector('#mute');
     this.solo_button = element.querySelector('#solo');
+    this.reset_button = element.querySelector('#reset');
+    this.audio_name = element.querySelector('#audio_name');
+    this.select_mark = element.querySelector('#select_mark'); //現在選択している音源のマークの表示
+    this.select_mark.style.color = "red";
     this.volume_temp = 1; //ボリュームの値の一時保存の変数　ミュートとソロの時に使う
     this.mute_flag = false; //ミュートの判定のフラグ
     this.solo_flag = false; //ソロの判定のフラグ
@@ -46,8 +45,20 @@ class seigyo{ //audiocontextとボリュームのノードとエフェクター�
     this.effect_switch.addEventListener( 'click', () => {this.switch()} );
     this.mute_button.addEventListener( 'click', () => {this.mute()} );
     this.solo_button.addEventListener( 'click', () => {this.solo()} );
+    this.reset_button.addEventListener( 'click', () => {this.reset()} );
     this.sentaku = sentaku; //配列内の何番目のインスタンスなのか
     this.sousakinshi = false; //エフェクターが操作禁止かどうかを判定する変数 falseが操作できる trueが操作不可
+    this.effectnode.then(
+      function onFulfilled(value){
+        this.effectnode = value;
+        this.sousin();
+      }.bind(this),
+    
+      // 失敗時に呼び出される
+      function onRejected(reason){
+        console.log(reason);
+      }.bind(this)
+    );
   }
 
   sousin(url) { //ファイルを選択したときの動作 audioタグのsrcに入れて各ノードを接続
@@ -55,8 +66,13 @@ class seigyo{ //audiocontextとボリュームのノードとエフェクター�
       audio[i].pause();
       audio[i].currentTime = 0; 
     }
+    this.audio_name.textContent = this.name;
+    sentaku_audio.textContent = seigyo_elements[sentaku].name;
     douji.value = "再生";
-    this.audio.src = url;
+    saisei_flag = false;
+    if(url != undefined){
+      this.audio.src = url;
+    }
     if(this.source == null){
       this.source = this.audioCtx.createMediaElementSource(this.audio); //ノード作成
     }
@@ -100,30 +116,36 @@ class seigyo{ //audiocontextとボリュームのノードとエフェクター�
     }
   }
 
-  switch(){ //エフェクトオフ・オンを押したときの動作
-    if(this.effect_switch.value == "エフェクトオフ"){ //エフェクトオフ・オンのボタンがエフェクトオフの時
-      this.feedback.gain.value = 0;
+  switch(){ //Bypassを押したときの動作
+    if(this.sousakinshi == false){ //エフェクトオフ・オンのボタンがエフェクトオフの時
+      this.wetgainnode.gain.value = 0;
+      this.drygainnode.gain.value = 1;
       if(this.sentaku == sentaku){ //エフェクトを適応する音源を選択して、その選択中の音源のエフェクトをオンオフするときだけ変更する
         effect_set.wet_gain.disabled = true; //スライダーを操作不能にする
         effect_set.dry_gain.disabled = true;
       }
       this.sousakinshi = true; //エフェクターが操作できるかどうかのフラグをtrueにする
-      this.effect_switch.value = "エフェクトオン" //ボタンの文字を変える
+      this.effect_switch.style.backgroundColor = "red";
+      this.effect_switch.style.color = "white";
     }
-    else if(this.effect_switch.value == "エフェクトオン"){ //エフェクトオフ・オンのボタンがエフェクトオンの時
-      this.feedback.gain.value = this.effect_temp[1];
+    else if(this.sousakinshi == true){ //エフェクトオフ・オンのボタンがエフェクトオンの時
+      this.wetgainnode.gain.value = this.effect_temp[0];
+      this.drygainnode.gain.value = this.effect_temp[1];
       if(this.sentaku == sentaku){
         effect_set.wet_gain.disabled = false; //スライダーを操作できるようにする
         effect_set.dry_gain.disabled = false;
       }
       this.sousakinshi = false; //エフェクターが操作できるかどうかのフラグをfalseにする
-      this.effect_switch.value = "エフェクトオフ" //ボタンの文字を変える
+      this.effect_switch.style.backgroundColor = "#F0F0F0";
+      this.effect_switch.style.color = "black";
     }
   }
 
   kirikaeru() { //切り替えを押したときの動作
+    seigyo_elements[sentaku].select_mark.textContent = "";
     sentaku = this.sentaku; //どれを操作しているかをこのインスタンスの配列の番号にする
     //各エフェクターの値をその音源の値にする
+    this.select_mark.textContent = "●";
     volume.value = this.volume_temp;
     pan.value = this.Pannode.pan.value;
     effect_set.wet_gain.value = this.effect_temp[0];
@@ -153,6 +175,8 @@ class seigyo{ //audiocontextとボリュームのノードとエフェクター�
       if(sentaku == this.sentaku){ //この音源が選択されているとき
         volume.disabled = true;
       }
+      this.mute_button.style.backgroundColor = "red";
+      this.mute_button.style.color = "white";
       this.mute_flag = true; //ミュートしてるかどうかのフラグをtrueに変える
     }
     else{
@@ -160,6 +184,8 @@ class seigyo{ //audiocontextとボリュームのノードとエフェクター�
       if(sentaku == this.sentaku){ //この音源が選択されているとき
         volume.disabled = false;
       }
+      this.mute_button.style.backgroundColor = "#F0F0F0";
+      this.mute_button.style.color = "black";
       this.mute_flag = false; //フラグをfalseに変える
     }
   }
@@ -173,6 +199,8 @@ class seigyo{ //audiocontextとボリュームのノードとエフェクター�
           seigyo_elements[i].solo_button.disabled = true; //iの音源のソロのボタンを操作不可にする
         }
       }
+      this.solo_button.style.backgroundColor = "red";
+      this.solo_button.style.color = "white";
       this.solo_flag = true; //ソロを判定するフラグをtrueに変える
     }
     else{
@@ -188,6 +216,8 @@ class seigyo{ //audiocontextとボリュームのノードとエフェクター�
           seigyo_elements[i].solo_button.disabled = false;//iの音源のソロのボタンを操作できるようにする
         }
       }
+      this.solo_button.style.backgroundColor = "#F0F0F0";
+      this.solo_button.style.color = "black";
       this.solo_flag = false; //ソロを判定するフラグをfalseにする
     }
   }
@@ -202,6 +232,10 @@ class effectset{ //エフェクトを操作するクラス
     this.wet_gain.addEventListener( 'input', () => {this.wet_gainset()} ); //スレショルドのスライダーを動かしたときの動作
     this.dry_gain.addEventListener( 'input', () => {this.dry_gainset()} );
     this.sentaku = 0; //エフェクターを適応する音源の選択、デフォルトで一つ目の音源が選択されている
+    this.wet_gain.value = seigyo_elements[0].effect_temp[0]; //プリセットに書き換える
+    this.wet_gain_view.textContent = seigyo_elements[0].effect_temp[0];
+    this.dry_gain.value = seigyo_elements[0].effect_temp[1];
+    this.dry_gain_view.textContent = seigyo_elements[0].effect_temp[1];
   }
 
   wet_gainset() {
@@ -220,70 +254,6 @@ class effectset{ //エフェクトを操作するクラス
 }
 
 //ここまでクラス
-
-window.AudioContext = window.AudioContext || window.webkitAudioContext;
-var number_of_seigyo = 4; //制御する音源の数
-var seigyo_elements = new Array(number_of_seigyo); //音源の制御する配列
-
-var arrayBuffer; //インパルス応答のバイナリデータ
-
-async function createReverb() {
-  let convolver = audioCtx.createConvolver();
-  let response = await fetch("IRData.mp3");
-  let arraybuffer = await response.arrayBuffer();
-  convolver.buffer = await audioCtx.decodeAudioData(arraybuffer);
-  return convolver;
-}
-
-/*
-ajaxRequest = new XMLHttpRequest();
-ajaxRequest.responseType = 'arraybuffer';
-var soundSource, concertHallBuffer;
-
-ajaxRequest.onload = function() {
-  var audioData = ajaxRequest.response;
-  audioCtx.decodeAudioData(audioData, function(buffer) {
-      console.log("a");
-      concertHallBuffer = buffer;
-      soundSource = audioCtx.createBufferSource();
-      soundSource.buffer = concertHallBuffer;
-    }, function(e){"Error with decoding audio data" + e.err});
-}
-
-ajaxRequest.open('GET', 'IRData.mp3', true);
-ajaxRequest.send();
-*/
-
-for(var i = 0; i < number_of_seigyo; i++) {
-  var audioCtx = new AudioContext();
-  var gainNode = audioCtx.createGain(); //ボリュームを変えるノードを作成
-  var Pannode = audioCtx.createStereoPanner(); //パンのノード
-
-  var analyserNode_before = audioCtx.createAnalyser(); //エフェクターで効果を与える前のアナライザー
-  analyserNode_before.fftSize = 2048;
-
-  var effectnode = createReverb();
-
-  var wetgainnode = audioCtx.createGain();
-  var drygainnode = audioCtx.createGain();
-  wetgainnode.gain.value = 0;
-  drygainnode.gain.value = 1;
-
-  var analyserNode_after = audioCtx.createAnalyser(); //エフェクターで効果を与えた後のアナライザー
-  analyserNode_after.fftSize = 2048;
-  //var effectnode = audioCtx.createConvolver();
-  seigyo_elements[i] = new seigyo(audioCtx,gainNode,effectnode,analyserNode_before,analyserNode_after,Pannode,wetgainnode,drygainnode); //音源の制御のインスタンスを格納
-}
-
-var sentaku = 0; //いまどの音源を操作するのかの値
-var source = new Array(number_of_seigyo);
-var url; //src
-
-var i = 0;
-for( let element of document.querySelectorAll('.seigyo') ) { //インスタンスを生成
-  seigyo_elements[i].touroku( element,i );
-  i++;
-}
 
 var audio = []
 var douji = document.querySelector('#douji');
@@ -344,76 +314,88 @@ saiseiichi.addEventListener('input', function( event ) { //再生位置のスラ
 });
 
 var volume = document.querySelector('#volume');
+var volumedb = document.querySelector('#volumedb');
 volume.addEventListener('input', function( event ) { //volumeのスライダーを動かしたときの動作
   seigyo_elements[sentaku].gainNode.gain.value = volume.value;
   seigyo_elements[sentaku].volume_temp = volume.value; //ボリュームの値の一時保存 ミュートとソロの時に使う
-  console.log(seigyo_elements[sentaku].volume_temp);
+  volumedb.textContent = Math.round(volume.value * 100);
 });
 
 var pan = document.querySelector('#pan');
+var direction = document.querySelector('#direction');
 pan.addEventListener('input', function( event ) { //panのスライダーを動かしたときの動作
   seigyo_elements[sentaku].Pannode.pan.value = pan.value;
+  if(pan.value == 0){
+    direction.textContent = "C";
+  }
+  else if(pan.value < 0){
+    direction.textContent = "L" + Math.round(Math.abs(pan.value) * 100);
+  }
+  else{
+    direction.textContent = "R" + Math.round(pan.value * 100);
+  }
 });
 
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
+var number_of_seigyo = 6; //制御する音源の数
+var seigyo_elements = new Array(number_of_seigyo); //音源の制御する配列
+
+var arrayBuffer; //インパルス応答のバイナリデータ
+
+async function createReverb() {
+  let convolver = audioCtx.createConvolver();
+  let response = await fetch("IRData.mp3");
+  let arraybuffer = await response.arrayBuffer();
+  convolver.buffer = await audioCtx.decodeAudioData(arraybuffer);
+  return convolver;
+}
+
+var preset = []; //demoのプリセットを格納する配列
+preset[0] = [0.1,1];
+preset[1] = [0,1]; 
+preset[2] = [0.1,1];
+preset[3] = [0.1,1];
+preset[4] = [0,1];
+var preset_name = ["Vocal.mp3","Drums.mp3","Piano.mp3","Guitar.mp3","Bass.mp3"];
+
+for(var i = 0; i < number_of_seigyo; i++) {
+  var audioCtx = new AudioContext();
+  var gainNode = audioCtx.createGain(); //ボリュームを変えるノードを作成
+  var Pannode = audioCtx.createStereoPanner(); //パンのノード
+
+  var analyserNode_before = audioCtx.createAnalyser(); //エフェクターで効果を与える前のアナライザー
+  analyserNode_before.fftSize = 2048;
+
+  var effectnode = createReverb();
+
+  var wetgainnode = audioCtx.createGain();
+  var drygainnode = audioCtx.createGain();
+
+  var preset_temp = preset[i]; //presetの中の配列を取り出す
+  if(preset_temp != undefined){
+    wetgainnode.gain.value = preset_temp[0];
+    drygainnode.gain.value = preset_temp[1];
+  }
+  else{
+    wetgainnode.gain.value = 0.1;
+    drygainnode.gain.value = 0.5;
+  }
+
+  var analyserNode_after = audioCtx.createAnalyser(); //エフェクターで効果を与えた後のアナライザー
+  analyserNode_after.fftSize = 2048;
+
+  var preset_temp = preset[i]; //presetの中の配列を取り出す
+  seigyo_elements[i] = new seigyo(audioCtx,gainNode,effectnode,analyserNode_before,analyserNode_after,Pannode,wetgainnode,drygainnode,preset_temp,preset_name[i]); //音源の制御のインスタンスを格納
+}
+
+var sentaku = 0; //いまどの音源を操作するのかの値
+var source = new Array(number_of_seigyo);
+var url; //src
+
+var i = 0;
+for( let element of document.querySelectorAll('.seigyo') ) { //インスタンスを生成
+  seigyo_elements[i].touroku( element,i );
+  i++;
+}
+
 let effect_set = new effectset(); //エフェクトを操作するインスタンス
-
-//ここからアナライザーの描画
-/*
-
-var analizer_canvas = document.querySelector('#analizer_canvas');
-var analizer_canvas_ctx = analizer_canvas.getContext('2d');
-window.setInterval(function() { //描画を繰り返す
-  var spectrums_before = new Uint8Array(1024);
-  seigyo_elements[sentaku].analyserNode_before.getByteFrequencyData(spectrums_before);
-  analizer_canvas_ctx.clearRect(0, 0, analizer_canvas.width, analizer_canvas.height);
-  analizer_canvas_ctx.beginPath();
-  analizer_canvas_ctx.strokeStyle = 'rgb( 0, 0, 0)';
-  for (var i = 1, len = 929; i <= len; i++) { //1番目が大体20Hz 929番目が大体20kHz
-    if(i < 3){ x = ((analizer_canvas.width / 8) / 2) * (i - 1); } //60Hzまでのx
-    else if(i < 5){ x = (analizer_canvas.width / 8) + ((analizer_canvas.width / 8) / 2) * (i - 3); } //100Hzまでのx
-    else if(i < 9){ x = (analizer_canvas.width / 8) * 2 + ((analizer_canvas.width / 8) / 4) * (i - 5); } //200Hzまでのx
-    else if(i < 23){ x = (analizer_canvas.width / 8) * 3 + ((analizer_canvas.width / 8) / 14) * (i - 9); } //500Hzまでのx
-    else if(i < 46){ x = (analizer_canvas.width / 8) * 4 + ((analizer_canvas.width / 8) / 23) * (i - 23); } //1000Hzまでのx
-    else if(i < 93){ x = (analizer_canvas.width / 8) * 5 + ((analizer_canvas.width / 8) / 47) * (i - 46); } //2000Hzまでのx
-    else if(i < 232){ x = (analizer_canvas.width / 8) * 6 + ((analizer_canvas.width / 8) / 139) * (i - 93); } //5000Hzまでのx
-    else if(i < 464){ x = (analizer_canvas.width / 8) * 7 + ((analizer_canvas.width / 8) / 232) * (i - 232); } //10000Hzまでのx
-    else if(i <= 929){ x = (analizer_canvas.width / 8) * 8 + ((analizer_canvas.width / 8) / 466) * (i - 464); } //20000Hzまでのx
-
-    var y = (1 - (spectrums_before[i] / 255)) * analizer_canvas.height;
-
-    if (i === 0) {
-      analizer_canvas_ctx.moveTo(x, y);
-    } else {
-        analizer_canvas_ctx.lineTo(x, y);
-    }
-  }
-  analizer_canvas_ctx.stroke();
-
-  var spectrums_after = new Uint8Array(1024);
-  seigyo_elements[sentaku].analyserNode_after.getByteFrequencyData(spectrums_after);
-  analizer_canvas_ctx.beginPath();
-  analizer_canvas_ctx.strokeStyle = 'rgb( 255, 0, 0)';
-  for (var i = 1, len = 929; i <= len; i++) {
-    if(i < 3){ x = ((analizer_canvas.width / 8) / 2) * (i - 1); } //60Hzまでのx
-    else if(i < 5){ x = (analizer_canvas.width / 8) + ((analizer_canvas.width / 8) / 2) * (i - 3); } //100Hzまでのx
-    else if(i < 9){ x = (analizer_canvas.width / 8) * 2 + ((analizer_canvas.width / 8) / 4) * (i - 5); } //200Hzまでのx
-    else if(i < 23){ x = (analizer_canvas.width / 8) * 3 + ((analizer_canvas.width / 8) / 14) * (i - 9); } //500Hzまでのx
-    else if(i < 46){ x = (analizer_canvas.width / 8) * 4 + ((analizer_canvas.width / 8) / 23) * (i - 23); } //1000Hzまでのx
-    else if(i < 93){ x = (analizer_canvas.width / 8) * 5 + ((analizer_canvas.width / 8) / 47) * (i - 46); } //2000Hzまでのx
-    else if(i < 232){ x = (analizer_canvas.width / 8) * 6 + ((analizer_canvas.width / 8) / 139) * (i - 93); } //5000Hzまでのx
-    else if(i < 464){ x = (analizer_canvas.width / 8) * 7 + ((analizer_canvas.width / 8) / 232) * (i - 232); } //10000Hzまでのx
-    else if(i <= 929){ x = (analizer_canvas.width / 8) * 8 + ((analizer_canvas.width / 8) / 466) * (i - 464); } //20000Hzまでのx
-
-    var y = (1 - (spectrums_after[i] / 255)) * analizer_canvas.height;
-
-    if (i === 0) {
-      analizer_canvas_ctx.moveTo(x, y);
-    } else {
-      analizer_canvas_ctx.lineTo(x, y);
-    }
-  }
-  analizer_canvas_ctx.stroke();
-}, 50);
-
-//ここまでアナライザーの描画
-*/
