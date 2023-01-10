@@ -395,7 +395,7 @@ var number_of_seigyo = 6; //制御する音源の数
 var seigyo_elements = new Array(number_of_seigyo); //音源の制御する配列
 
 var preset = []; //demoのプリセットを格納する配列
-preset[0] = [0.1,0];
+preset[0] = [0.25,0.1];
 preset[1] = [0.1,0]; 
 preset[2] = [0.1,0];
 preset[3] = [0.1,0];

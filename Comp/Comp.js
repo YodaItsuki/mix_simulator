@@ -481,10 +481,10 @@ var number_of_seigyo = 6; //制御する音源の数
 var seigyo_elements = new Array(number_of_seigyo); //音源の制御する配列
 
 var preset = []; //demoのプリセットを格納する配列
-preset[0] = [0,2,0.003,0.25];
-preset[1] = [0,2,0.003,0.25]; 
-preset[2] = [0,2,0.003,0.25];
-preset[3] = [0,2,0.003,0.25];
+preset[0] = [-34,3,0.100,0.25];
+preset[1] = [-40,7,0.150,0.25]; 
+preset[2] = [-30,3,0.015,0.25];
+preset[3] = [-30,3,0.015,0.25];
 preset[4] = [0,2,0.003,0.25];
 var preset_name = ["Vocal.mp3","Drums.mp3","Piano.mp3","Guitar.mp3","Bass.mp3"];
 
