@@ -650,7 +650,6 @@ window.setInterval(function() { //描画を繰り返す
     }
   }
   before_peak = 10 * Math.log10(before_peak); //デシベルに変換
-  console.log(before_peak);
   meter_canvas_ctx.clearRect(0, 0, meter_canvas.width, meter_canvas.height);
   meter_canvas_ctx.globalAlpha = 0.5;
   meter_canvas_ctx.fillStyle = 'blue';

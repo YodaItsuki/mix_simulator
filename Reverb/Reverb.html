@@ -9,22 +9,6 @@
   <link rel="stylesheet" href="Reverb.css">
 </head>
 <body>
-  <div class="effect_object">
-    <div class="effects_view">
-      <div class="sentaku_audio_div">
-        <label id="sentaku_audio">曲名</label>
-        <br>
-      </div>
-      <div class="effects_slider">
-        <div class="volume_pan"><label id="effects">ボリューム</label><input type="range" id="volume" min="0" max="2" step="0.01" value="1"><div class="number_view"><span id="volumedb">100</span>%</div></div>
-        <div class="volume_pan"><label id="effects">パン</label><input type="range" id="pan" min="-1" max="1" step="0.01" value="0"><div class="number_view"><span id="direction">C</span></div></div>
-        <br>
-        <object data="./IRData.mp3" id="irdata" hidden></object>
-        <div class="reverb"><div><label id="effects">Wet</label><input type="range" id="wet_gain" min="0" max="1" step="0.1" value="0.1"><div class="number_view"><span id="wet_gain_view">0.1</span></div></div></div>
-        <div class="reverb"><div><label id="effects">Dry</label><input type="range" id="dry_gain" min="0" max="1" step="0.1" value="0.5"><div class="number_view"><span id="dry_gain_view">0.5</span></div></div></div>
-      </div>
-    </div>
-  </div>
   <div class="seigyo">
     <audio src="../demo/Vocal.mp3" id="audio" preload="metadata"></audio>
     <input type="file" id="filesousin" accept=".mp3, .ogg">
@@ -95,6 +79,22 @@
     <input type="button" id="douji" value="再生" disabled>
     <input type="range" id="saiseiichi" min="0" max="" step="1" value="0" disabled>
     <span id="saiseijikan">0:00</span>
+  </div>
+  <div class="effect_object">
+    <div class="effects_view">
+      <div class="sentaku_audio_div">
+        <label id="sentaku_audio"></label>
+        <br>
+      </div>
+      <div class="effects_slider">
+        <div class="volume_pan"><label id="effects">ボリューム</label><input type="range" id="volume" min="0" max="2" step="0.01" value="1"><div class="number_view"><span id="volumedb">100</span>%</div></div>
+        <div class="volume_pan"><label id="effects">パン</label><input type="range" id="pan" min="-1" max="1" step="0.01" value="0"><div class="number_view"><span id="direction">C</span></div></div>
+        <br>
+        <object data="./IRData.mp3" id="irdata" hidden></object>
+        <div class="reverb"><div><label id="effects">ウェット</label><input type="range" id="wet_gain" min="0" max="1" step="0.1" value="0.1"><div class="number_view"><span id="wet_gain_view">0.1</span></div></div></div>
+        <div class="reverb"><div><label id="effects">ドライ</label><input type="range" id="dry_gain" min="0" max="1" step="0.1" value="0.5"><div class="number_view"><span id="dry_gain_view">0.5</span></div></div></div>
+      </div>
+    </div>
   </div>
   <a href="../index.html">トップページに戻る</a>
 </body>

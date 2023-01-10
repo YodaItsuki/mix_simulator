@@ -2,7 +2,8 @@
     display: flex;
 }
 .effects_view{
-    margin-top: 15px;
+    margin-top: 10px;
+    height: 404px;
 }
 .volume_pan{
     margin:4px;
